@@ -35,11 +35,12 @@ function publish( channel, options, topology, log, message ) {
 		'CorrelationId': message.correlationId
 	};
 	message.headers = _.merge( baseHeaders, message.headers );
-	var payload = new Buffer( JSON.stringify( message.body ) );
+	var isBinary = Buffer.isBuffer(message.body);
+	var payload = isBinary ? message.body : new Buffer( JSON.stringify( message.body ) );
 	var publishOptions = {
 		type: message.type || '',
-		contentType: 'application/json',
-		contentEncoding: 'utf8',
+		contentType: isBinary ? (void 0) : 'application/json',
+		contentEncoding: isBinary ? (void 0) : 'utf8',
 		correlationId: message.correlationId || '',
 		replyTo: message.replyTo || topology.replyQueue.name || '',
 		messageId: message.messageId || message.id || '',
